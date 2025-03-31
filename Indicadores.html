@@ -1,0 +1,129 @@
+﻿<body style="background-color: #99d9ea;">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <script type="text/javascript" src="./scripts/chart.min.js"></script>
+  
+<head>
+    <link rel="stylesheet" href="./Content/bootstrat.4.1.0.min.css">
+
+
+    <style>
+        .txt_verde {
+            background-color: #83e28e;
+            color: black;
+            text-align: left;        
+            font-size: 10px;
+        }
+
+        .boton-buscar {
+            background-color: #FFC107; /* Amarillo */
+            color: black; 
+            font-weight: bold;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+
+        .boton-buscar:hover {
+            background-color: #FFB300; /* Color ligeramente más oscuro al pasar el mouse */
+        }
+    </style>
+</head>
+<body style="background-color: #99d9ea;">
+
+    <script src="./scripts/JQuery3.5.1.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="./Scripts/bootstrap.min.js"></script>
+    <script src="./scripts/General/autoNumeric.js"></script>
+    <script src="./scripts/General/General.js"></script>
+    <script src="./scripts/General/Mensaje.js"></script>
+    <script src="./scripts/General/jquery.table2excel.js"></script>
+
+    <br>
+    <div class="offcanvas offcanvas-start show text-bg-dark" tabindex="-1" id="offcanvas" aria-labelledby="offcanvasLabel" style="display:flex;justify-content: center;">
+        <div class="card" style="width:98%">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
+                        <table style="width: 100%;" >
+                            <thead>
+                                <tr>
+                                    <td class="style='background-color: #bfbfbf;color: black;font-weight: bold;text-align: center;'" colspan="2"><b>INDICADORES SOCIOECONÓMICOS</b></td>
+                                </tr>
+                                <tr>                                    
+                                    <td style="background-color:#83cceb; text-align: left; width: 95%;"><b>VARIABLE</b></td>
+                                    <td style="background-color:#83cceb; text-align: center;">Sel</td>
+                                </tr>       
+                            </thead>
+                            <tbody id="body_lista_indicadores">                                
+                            </tbody>
+                        </table>
+                        <br>
+                        <table class="width: 100%;" style="border-collapse: collapse;font-size: 10px;">
+                            <thead>
+                               
+                                <tr>                                    
+                                    <td style="background-color:#83cceb; text-align: left; width: 95%;"><b>Indicadores Compuestos</b></td>
+                                    <td style="background-color:#83cceb; text-align: center;">Sel</td>
+                                </tr>       
+                            </thead>
+                            <tbody id="body_lista_indicadoresC">                                
+                            </tbody>
+                        </table>
+                        <br>
+                        <button class="boton-buscar" onclick="Graficas.consultar_datos()">BUSCAR</button>
+                        <button class="boton-buscar" onclick="Graficas.limpiarIndicadores()">LIMPIAR</button>
+                    </div>  
+                    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8"  >
+                        <div id="div_tablaData" style=" overflow: auto;width: 100%; max-height: 700px; "  >                        
+                        </div>
+                    <br>
+                    <table  style="border-collapse: collapse;font-size: 10px;">
+                        <tr style="height:450px; display: none;" id="fil_myChart0">
+                            <td width="650px;">
+                                <canvas id="myChart0" style="display: block; box-sizing: border-box; "></canvas>
+                            </td>
+                        </tr>
+                        <tr style="height:450px; display: none;" id="fil_myChart1">
+                            <td width="650px;" >
+                                <canvas id="myChart1" style="display: block; box-sizing: border-box; "></canvas>
+                            </td>
+                        </tr>
+                        <tr style="height:450px; display: none;" id="fil_myChart2">
+                            <td width="650px;">
+                                <canvas id="myChart2" style="display: block; box-sizing: border-box; "></canvas>
+                            </td>
+                        </tr>
+                    </table> 
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+<div class="row"></div>
+<br>
+<br>
+
+
+    
+</body>
+
+
+<script src="./scripts/Graficas.js"></script>
+<script src="./scripts/datos.js"></script>
+<script>
+    $(document).ready(function () {
+        Graficas.cargar_datos();
+        Graficas.mostrarTabla();
+    });
+
+    function GenerarReporte2(DatosMuniDpto) {        
+        Graficas.setearDatos(DatosMuniDpto);
+    }
+</script>
+
+</html>

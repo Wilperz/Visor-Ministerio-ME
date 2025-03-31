@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Visor de Municipios de Colombia ME</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <iframe id="miIframe" src="Indicadores.html" style="width: 100%;height: 100vh;border: none;"></iframe>
+  </body>
+</html>
+<script>
+ 
+
+  function GenerarReporte(DatosMuniDpto) {
+      var iframe = document.getElementById('miIframe');
+      if (iframe.contentWindow && iframe.contentWindow.GenerarReporte2) {
+          iframe.contentWindow.GenerarReporte2(DatosMuniDpto);
+      }      
+  }
+</script>
