@@ -109,6 +109,7 @@ export async function fetchMunicipalityData_Sb(
 }
 
 export async function fetchInitialMunicipios() {
+  console.log("**fetchInitialMunicipios")
   try {
     if (APP_CONFIG.apiPython) {
       const response = await fetch(`${APP_CONFIG.pythonApiUrl}/initial-municipios`);
@@ -147,21 +148,46 @@ export async function fetchMunicipalitiesByDepartment(departmentId: string): Pro
       }
       return await response.json();
     } else {
-      const { data, error } = await supabase
-        .from('div_territorial_zonas')
-        .select('mpio_cdpmp, mpio_cnmbr')
-        .eq('dpto_ccdgo', departmentId)
-        .order('mpio_cnmbr');
+      console.log("**fetchMunicipalitiesByDepartment:", departmentId);
+      
+      // Initialize arrays to store all data
+      let allData: any[] = [];
+      let hasMore = true;
+      let page = 0;
+      const pageSize = 1000;
 
-      if (error) {
-        throw error;
+      // Fetch all pages
+      while (hasMore) {
+        const { data, error } = await supabase
+          .from('div_territorial_zonas')
+          .select('mpio_cdpmp, mpio_cnmbr')
+          .eq('dpto_ccdgo', departmentId)
+          .order('mpio_cnmbr')
+          .range(page * pageSize, (page + 1) * pageSize - 1);
+
+        if (error) {
+          throw error;
+        }
+
+        if (data && data.length > 0) {
+          allData = [...allData, ...data];
+          if (data.length < pageSize) {
+            hasMore = false;
+          }
+        } else {
+          hasMore = false;
+        }
+
+        page++;
       }
+
+      console.log("Cantidad total de municipios retornados:", allData.length);
 
       // Create a Map to store unique municipalities
       const uniqueMunicipalities = new Map();
       
       // Only keep the first occurrence of each mpio_cdpmp
-      data.forEach(muni => {
+      allData.forEach(muni => {
         if (!uniqueMunicipalities.has(muni.mpio_cdpmp)) {
           uniqueMunicipalities.set(muni.mpio_cdpmp, muni);
         }

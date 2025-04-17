@@ -90,7 +90,7 @@ export const DEPARTMENTS = [
   { id: '94', name: 'GUAINÍA', zone: 'estructura_3' },
 
   //Zomac
-  { id: '05', name: 'ANTIOQUIA', zone: 'ZOMAC' },
+  { id: '5', name: 'ANTIOQUIA', zone: 'ZOMAC' },
   { id: '13', name: 'BOLÍVAR', zone: 'ZOMAC' },
   { id: '15', name: 'BOYACÁ', zone: 'ZOMAC' },
   { id: '17', name: 'CALDAS', zone: 'ZOMAC' },
