@@ -1,9 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
-import type { Map } from 'ol';
+import { useState, useEffect } from 'react';
 import { FilterContainer } from './filter/FilterContainer';
 import { ResultsContainer } from './results/ResultsContainer';
 import type { Municipality } from '../types/municipality';
-import { supabase } from '../lib/supabase';
+import { fetchInitialMunicipios } from '../lib/api';
 import { APP_CONFIG } from '../config/app';
 
 export function MainLayout() {
@@ -12,45 +11,17 @@ export function MainLayout() {
   const [displayedMunicipalities, setDisplayedMunicipalities] = useState<Municipality[]>([]);
   const [selectedDeterminants, setSelectedDeterminants] = useState<Set<string>>(new Set());
 
-  const mainMapRef = useRef<Map | null>(null);
-  const secondaryMapRef = useRef<Map | null>(null);
-
   useEffect(() => {
     async function loadInitialPolygons() {
-      // Only load initial polygons if initialLoad is true
       if (!APP_CONFIG.initialLoad) {
         return;
       }
 
       try {
-        const { data: municipiosData, error } = await supabase
-          .from('municipios')
-          .select('*')
-          .limit(1); // Start with a small query to test connection
-
-        if (error) {
-          console.error('Error loading initial polygons:', error.message);
-          if (error.response) {
-            console.error('Response status:', error.response.status);
-            console.error('Response headers:', error.response.headers);
-          }
-          return;
-        }
-
-        if (municipiosData) {
-          const features = municipiosData.map(muni => ({
-            type: 'Feature',
-            geometry: muni.geom,
-            properties: {}
-          }));
-
-          setDisplayedFeatures(features);
-        }
+        const features = await fetchInitialMunicipios();
+        setDisplayedFeatures(features);
       } catch (error) {
         console.error('Error in loadInitialPolygons:', error);
-        if (error instanceof Error) {
-          console.error('Error details:', error.message);
-        }
       }
     }
 
@@ -65,7 +36,7 @@ export function MainLayout() {
 
   const handleComparisonSearch = (features: any[], municipalities: Municipality[]) => {
     setComparisonFeatures(features);
-    setDisplayedMunicipalities(prev => [...prev, ...municipalities]);
+    setDisplayedMunicipalities(municipalities);
   };
 
   const handleClear = () => {
@@ -88,8 +59,6 @@ export function MainLayout() {
         comparisonFeatures={comparisonFeatures}
         displayedMunicipalities={displayedMunicipalities}
         selectedDeterminants={selectedDeterminants}
-        onMainMapInit={(map) => mainMapRef.current = map}
-        onSecondaryMapInit={(map) => secondaryMapRef.current = map}
       />
     </div>
   );

@@ -1,24 +1,33 @@
-﻿<body style="background-color: #99d9ea;">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+﻿    
+
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <title>Indicadores - Ministerio de Minas y Energía MME</title>
     
-    <script type="text/javascript" src="./scripts/chart.min.js"></script>
-  
-<head>
-    <link rel="stylesheet" href="./Content/bootstrat.4.1.0.min.css">
-
-
+        <link rel="stylesheet" href="./Content/bootstrat.4.1.0.min.css">
+        <script type="text/javascript" src="./scripts/chart.min.js"></script>
+        <script src="./scripts/JQuery3.5.1.js"></script>
+        <script src="./scripts/General/General.js"></script>
+        <script src="./scripts/General/Mensaje.js"></script>
+        
+    
+        <script src="./scripts/Graficas.js"></script>
+        <script src="./scripts/funciones.js"></script>
+        <script src="./scripts/datos.js"></script>
+        <script src="./scripts/xlsx.full.min.js"></script>
     <style>
         .txt_verde {
-            background-color: #83e28e;
+            
             color: black;
             text-align: left;        
             font-size: 10px;
         }
 
         .boton-buscar {
-            background-color: #FFC107; /* Amarillo */
-            color: black; 
+            background-color: #f97316; /* Amarillo */
+            color: white; 
             font-weight: bold;
             border: none;
             padding: 10px 20px;
@@ -29,46 +38,72 @@
         }
 
         .boton-buscar:hover {
-            background-color: #FFB300; /* Color ligeramente más oscuro al pasar el mouse */
+            background-color: #c2410c; /* Color ligeramente más oscuro al pasar el mouse */
         }
     </style>
 </head>
-<body style="background-color: #99d9ea;">
-
-    <script src="./scripts/JQuery3.5.1.js"></script>
-    <!-- Bootstrap JS -->
-    <script src="./Scripts/bootstrap.min.js"></script>
-    <script src="./scripts/General/autoNumeric.js"></script>
-    <script src="./scripts/General/General.js"></script>
-    <script src="./scripts/General/Mensaje.js"></script>
-    <script src="./scripts/General/jquery.table2excel.js"></script>
-
+<body style="background-color: white">
     <br>
     <div class="offcanvas offcanvas-start show text-bg-dark" tabindex="-1" id="offcanvas" aria-labelledby="offcanvasLabel" style="display:flex;justify-content: center;">
         <div class="card" style="width:98%">
             <div class="card-body">
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
-                        <table style="width: 100%;" >
+                        <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
                             <thead>
                                 <tr>
-                                    <td class="style='background-color: #bfbfbf;color: black;font-weight: bold;text-align: center;'" colspan="2"><b>INDICADORES SOCIOECONÓMICOS</b></td>
+                                    <td style="background-color: #FFFFFF; color: black; font-weight: bold; text-align: center;" colspan="2">
+                                        <b>INDICADORES SOCIOECONÓMICOS</b>
+                                    </td>
                                 </tr>
+                                </thead>
+                            </table>
+
+                            <table style="
+                            width: 100%;
+                            border-collapse: separate;
+                            border-spacing: 0;
+                            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+                            border-radius: 12px;
+                            overflow: hidden;
+                        ">
                                 <tr>                                    
-                                    <td style="background-color:#83cceb; text-align: left; width: 95%;"><b>VARIABLE</b></td>
-                                    <td style="background-color:#83cceb; text-align: center;">Sel</td>
-                                </tr>       
+                                    <td colspan="2" style="background-color: #f97316; text-align: left; width: 95%; border-top-left-radius: 12px; padding: 8px; color: white; ">
+                                        <b>VARIABLE</b>
+                                    </td>
+                                    <td style="background-color: #f97316; text-align: center; border-top-right-radius: 12px; padding: 8px;  color: white;">
+                                        <b>Sel</b>
+                                    </td>                                    
+                                </tr>
+                                <!--
+                                <tr id="div_" style="font-size: 10px;"><td></td><td >
+                                    <span style="cursor: pointer;" onclick="Graficas.ocultar('')">[Cerrar]</span><br>
+                                    <b>Descripción: </b><span id="div_des_">xxx</span> <br>
+                                    <b>Definición: </b><span id="div_des_">xxx</span> <br>
+                                    <b>Observación: </b><span id="div_des_">xxx</span> <br>
+                                    <b>Institución / Fuente: </b><span id="div_des_">xxx</span> <br>
+                                    <b>Escala: </b><span id="div_des_">xxx</span> <br>
+                                </td><td></td></tr>
+                                -->
                             </thead>
                             <tbody id="body_lista_indicadores">                                
                             </tbody>
                         </table>
+                        
                         <br>
-                        <table class="width: 100%;" style="border-collapse: collapse;font-size: 10px;">
+                        <table class="width: 100%;" style="
+                        width: 100%;
+                        border-collapse: separate;
+                        border-spacing: 0;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+                        border-radius: 12px;
+                        overflow: hidden;
+                    ">
                             <thead>
                                
                                 <tr>                                    
-                                    <td style="background-color:#83cceb; text-align: left; width: 95%;"><b>Indicadores Compuestos</b></td>
-                                    <td style="background-color:#83cceb; text-align: center;">Sel</td>
+                                    <td style="background-color: #f97316; text-align: left; width: 95%; border-top-left-radius: 12px; padding: 8px; color: white; "><b>Indicadores Compuestos</b></td>
+                                    <td style="background-color: #f97316; text-align: center; border-top-right-radius: 12px; padding: 8px;  color: white;"><b>Sel</b></td>
                                 </tr>       
                             </thead>
                             <tbody id="body_lista_indicadoresC">                                
@@ -113,10 +148,12 @@
 </body>
 
 
-<script src="./scripts/Graficas.js"></script>
-<script src="./scripts/datos.js"></script>
+
 <script>
     $(document).ready(function () {
+
+       // Graficas.setearDatos('5,5001,17,17001');
+
         Graficas.cargar_datos();
         Graficas.mostrarTabla();
     });
@@ -124,6 +161,7 @@
     function GenerarReporte2(DatosMuniDpto) {        
         Graficas.setearDatos(DatosMuniDpto);
     }
+    
 </script>
 
 </html>

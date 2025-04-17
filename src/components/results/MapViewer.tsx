@@ -86,7 +86,7 @@ export function MapViewer({
         type: 'FeatureCollection',
         features
       };
-      
+
       vectorSourceRef.current.addFeatures(
         new GeoJSON().readFeatures(geoJsonData, {
           featureProjection: 'EPSG:3857',
@@ -94,29 +94,13 @@ export function MapViewer({
         })
       );
 
-      if (!disableAutoZoom && mapInstanceRef.current) {
+      if (mapInstanceRef.current) {
         const extent = vectorSourceRef.current.getExtent();
         const view = mapInstanceRef.current.getView();
-
-        if (initialLoadRef.current) {
-          view.fit(extent, {
-            padding: [50, 50, 50, 50],
-            duration: 1000
-          });
-          initialLoadRef.current = false;
-        } else {
-          const currentZoom = view.getZoom();
-          const currentCenter = view.getCenter();
-          
-          if (currentZoom === 6 && currentCenter && 
-              currentCenter[0] === fromLonLat([-74.2973, 4.5709])[0] && 
-              currentCenter[1] === fromLonLat([-74.2973, 4.5709])[1]) {
-            view.fit(extent, {
-              padding: [50, 50, 50, 50],
-              duration: 1000
-            });
-          }
-        }
+        view.fit(extent, {
+          padding: [50, 50, 50, 50],
+          duration: 1000
+        });
       }
     }
   }, [features, disableAutoZoom]);

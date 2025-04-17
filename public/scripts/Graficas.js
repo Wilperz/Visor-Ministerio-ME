@@ -6,6 +6,7 @@
     this._DeptosXZona = Array();
 
     this._datos = null;
+    this._datosFormateados = Array();
 
     this._myChart0 = null;
     this._myChart1 = null;
@@ -21,11 +22,21 @@
 
     this._NombresColumnas = Array();
     this._DatosTabla = Array();
+    this._VisualDatos = Array();
 
     this._IdDepto1 = "8";
-    this._IdMun1 = "8001";
+    this._IdMun1 = "-1";
     this._IdDepto2 = "-1";
     this._IdMun2 = "-1";
+
+    this._NombreDepto1 = "";
+    this._NombreDepto2 = "";
+    this._NombreMun1 = "";
+    this._NombreMun2 = "";
+
+    this._SimboloDecimal = ",";
+    this._SimboloMiles = ".";
+    this._SimboloMillones = "'";
 
 
     this.setearDatos = function(cadena){
@@ -42,8 +53,39 @@
         vDummy = arreglo[3] == "0" ? "-1": arreglo[3];         
         this._IdMun2 = Number(vDummy).toString();
 
-        Graficas.limpiarIndicadores();
+        this._NombreDepto1 = "";
+        this._NombreDepto2 = "";
+        this._NombreMun1 = "";
+        this._NombreMun2 = "";
 
+        if(this._IdDepto1 != -1){
+            let vObj = Graficas._Deptos.find(item => item[0] === (this._IdDepto1+''));
+            this._NombreDepto1 = vObj[1];
+        }
+        if(this._IdMun1 == -1){
+            this._NombreMun1 = 'Todos los municipios';
+        }
+        else{
+            let vObj = Graficas._Muni.find(item => item[0] === (this._IdMun1+''));
+            this._NombreMun1 = vObj[1];
+        }
+
+        if(this._IdDepto2 != -1){
+            let vObj = Graficas._Deptos.find(item => item[0] === (this._IdDepto2+''));
+            this._NombreDepto2 = vObj[1];
+            if(this._IdMun2 == -1){
+                this._NombreMun2 = 'Todos los municipios';
+            }
+            else{
+                let vObj = Graficas._Muni.find(item => item[0] === (this._IdMun2+''));
+                this._NombreMun2 = vObj[1];
+            }
+
+        }
+
+        
+
+        Graficas.limpiarIndicadores();
     }
 
     
@@ -56,57 +98,60 @@
           ];
           
           Graficas._ListaIndicadores = [
-            ["PIB por habitante", "pibxhabitante"],
-            ["Actividades primarias", "actividades_primarias"],
-            ["Actividades secundarias", "actividades_secundarias"],
-            ["Actividades terciarias", "actividades_terciarias"],
-            ["Pobreza Monetaria Extrema", "pobreza_monetaria_extrema"],
-            ["Población Rural", "pobl_rur"],
-            ["Población Urbano", "pobl_urb"],
-            ["Población Total", "pobl_tot"],
-            ["NBI", "nbi"],
-            ["IPM", "IPM"],
-            ["Índice de Cobertura de Energía Eléctrica en la Cabecera Municipal", "icee_cm"],
-            ["Cobertura de Energía Eléctrica en el Resto", "icee_resto"],
-            ["Índice de Cobertura de Energía Eléctrica Total", "icee_tot"],
-            ["Posición nacional según desempeño integral", "DI_p_nal"],
-            ["Índice de Desarrollo Municipal ", "indesarrollo_mun"],
-            ["Cobertura efectiva de gas natural ", "cob_gres_efec"],
-            ["Tasa de homicidios por cada 100.000 habitantes ", "homicidios_x_cada_100000_habitantes"],
-            ["Población en condición de miseria", "poblacion_en_condicion_de_miseria"],
-            ["Cobertura de acueducto ", "cobertura_de_acueducto"],
-            ["Cobertura de alcantarillado", "cobertura_de_alcantarillado"],
+            ["PIB por habitante", "pibxhabitante", "F2",4],
+            ["Actividades primarias", "actividades_primarias","F2",4],
+            ["Actividades secundarias", "actividades_secundarias","F2",4],
+            ["Actividades terciarias", "actividades_terciarias","F2",4],
+            ["Pobreza Monetaria Extrema", "pobreza_monetaria_extrema","F1",3],
+            ["Población Rural", "pobl_rur","F3",0],
+            ["Población Urbano", "pobl_urb","F3",0],
+            ["Población Total", "pobl_tot","F3",0],
+            ["NBI", "nbi","F4",3],
+            ["IPM", "IPM","F1",3],
+            ["Índice de Cobertura de Energía Eléctrica en la Cabecera Municipal", "icee_cm","F4",3],
+            ["Cobertura de Energía Eléctrica en el Resto", "icee_resto","F4",3],
+            ["Índice de Cobertura de Energía Eléctrica Total", "icee_tot","F4",3],
+            ["Posición nacional según desempeño integral", "DI_p_nal","F3",0],
+            ["Índice de Desarrollo Municipal ", "indesarrollo_mun","F1",3],
+            ["Cobertura efectiva de gas natural ", "cob_gres_efec","F4",3],
+            ["Tasa de homicidios por cada 100.000 habitantes ", "homicidios_x_cada_100000_habitantes","F1",3],
+            ["Población en condición de miseria", "poblacion_en_condicion_de_miseria","F4",3],
+            ["Cobertura de acueducto ", "cobertura_de_acueducto","F4",3],
+            ["Cobertura de alcantarillado", "cobertura_de_alcantarillado","F4",3],
           ];
 
           Graficas._ListaIndicadoresC = [
-            ["Año de reporte de la base de datos", "anno_", "PRE","año_"],
-            ["Porcentaje en el municipio", "_pct" , "POS","_%"],
-            ["Porcentaje en el departamento", "t_pct", "POS", "t_%"],
-            ["Posición en el departamento", "rank_dep", "PRE", "rank_dep"],
-            ["Posición en nacional", "rank_nac", "PRE", "rank_nac"],        
+            ["Año de reporte de la base de datos", "anno_", "PRE","Año de reporte -","NA",0],
+            ["Porcentaje en el municipio", "_pct" , "POS","Porcentaje en el municipio -","F4",3],
+            ["Porcentaje en el departamento", "t_pct", "POS", "Porcentaje en el departamento - ","F4",3],
+            ["Posición en el departamento", "rank_dep_", "PRE", "Posición en el departamento - ","F3",0],
+            ["Posición en nacional", "rank_nac_", "PRE", "Posición nacional - ","F3",0],        
           ];
 
           Graficas._AsoIndi = [
             ["pibxhabitante",["anno_", "rank_nac"] ], 
-            ["actividades_primarias",["anno_", "rank_dep", "rank_nac"] ], 
-            ["actividades_secundarias",["anno_", "rank_dep", "rank_nac"] ], 
-            ["actividades_terciarias",["anno_", "rank_dep", "rank_nac"] ], 
-            ["pobreza_monetaria_extrema",["anno_", "rank_nac"] ], 
-            ["pobl_rur",["anno_", "rank_dep", "rank_nac","_pct","t_pct"] ], 
-            ["pobl_urb",["anno_", "rank_dep", "rank_nac","_pct","t_pct"] ], 
-            ["pobl_tot",["anno_", "rank_dep", "rank_nac","_pct","t_pct"] ], 
-            ["nbi",["anno_", "rank_dep", "rank_nac"] ], 
-            ["IPM",["anno_", "rank_dep", "rank_nac"] ], 
-            ["icee_cm",["anno_", "rank_dep", "rank_nac"] ], 
-            ["icee_resto",["anno_", "rank_dep", "rank_nac"] ], 
-            ["icee_tot",["anno_", "rank_dep", "rank_nac"] ], 
-            ["DI_p_nal",["anno_", "rank_dep", "rank_nac"] ], 
-            ["indesarrollo_mun",["anno_", "rank_dep", "rank_nac"] ], 
-            ["cob_gres_efec",["anno_", "rank_dep", "rank_nac"] ], 
-            ["homicidios_x_cada_100000_habitantes",["anno_", "rank_dep", "rank_nac"] ], 
-            ["poblacion_en_condicion_de_miseria",["anno_", "rank_dep", "rank_nac"] ], 
-            ["cobertura_de_acueducto",["anno_", "rank_dep", "rank_nac"] ], 
-            ["cobertura_de_alcantarillado",["anno_", "rank_dep", "rank_nac"] ], 
+            ["actividades_primarias",["anno_", "rank_dep_", "rank_nac_"] ], 
+            ["actividades_secundarias",["anno_", "rank_dep_", "rank_nac_"] ], 
+            ["actividades_terciarias",["anno_", "rank_dep_", "rank_nac_"] ], 
+            ["pobreza_monetaria_extrema",["anno_", "rank_nac_"] ], 
+            ["pobl_rur",["anno_", "rank_dep_", "rank_nac_","_pct","t_pct"] ], 
+            //["pobl_urb",["anno_", "rank_dep", "rank_nac","_pct","t_pct"] ], 
+            ["pobl_urb",["anno_", "rank_dep_", "rank_nac_","_pct"] ], 
+            //["pobl_tot",["anno_", "rank_dep", "rank_nac","_pct","t_pct"] ], 
+            ["pobl_tot",["anno_", "rank_dep_", "rank_nac_","t_pct"] ], 
+            ["nbi",["anno_", "rank_dep_", "rank_nac_"] ], 
+            ["IPM",["anno_", "rank_dep_", "rank_nac_"] ], 
+            ["icee_cm",["anno_", "rank_dep_", "rank_nac_"] ], 
+            ["icee_resto",["anno_", "rank_dep_", "rank_nac_"] ], 
+            ["icee_tot",["anno_", "rank_dep_", "rank_nac_"] ], 
+            //["DI_p_nal",["anno_", "rank_dep", "rank_nac"] ], 
+            ["DI_p_nal",["anno_"] ], 
+            ["indesarrollo_mun",["anno_", "rank_dep_", "rank_nac_"] ], 
+            ["cob_gres_efec",["anno_", "rank_dep_", "rank_nac_"] ], 
+            ["homicidios_x_cada_100000_habitantes",["anno_", "rank_dep_", "rank_nac_"] ], 
+            ["poblacion_en_condicion_de_miseria",["anno_", "rank_dep_", "rank_nac_"] ], 
+            ["cobertura_de_acueducto",["anno_", "rank_dep_", "rank_nac_"] ], 
+            ["cobertura_de_alcantarillado",["anno_", "rank_dep_", "rank_nac_"] ], 
           ];
           
           Graficas.dibujar_lista_indicadores();
@@ -118,14 +163,23 @@
             var vTabla = '';
             for (var i = 0; i < Graficas._ListaIndicadores.length; i++) {                
                 var vFila = Graficas._ListaIndicadores[i];
-                vTabla += " <tr><td class='txt_verde' style='border: 1px solid black;vertical-align: middle;padding: 5px;' >"+vFila[0]+"</td><td style='text-align: center;border: 1px solid black;vertical-align: middle;padding: 5px;'><input class='components'  type='checkbox'  id='"+vFila[1]+"' name='"+vFila[1]+"' value='0'></td></tr>";
+                vTabla += " <tr '><td style='cursor: pointer;width: 5px;text-align: right;' ><span onclick=\"Graficas.verInf('"+vFila[1]+"')\">[+]</span></td><td class='txt_verde' style='vertical-align: middle;padding: 5px;border-bottom: 1px solid #ccc;' >"+vFila[0]+"</td><td style='text-align: center;padding: 5px;border-bottom: 1px solid #ccc;'><input class='components'  type='checkbox'  id='"+vFila[1]+"' name='"+vFila[1]+"' value='0'></td></tr>";
+
+                vTabla += '<tr id="div_zoom_'+vFila[1]+'" style="font-size: 10px;display:none;"><td></td><td >';
+                vTabla += '<span style="cursor: pointer;" onclick="Graficas.ocultar(\''+vFila[1]+'\')">[Cerrar]</span><br>';
+                vTabla += '<b>Descripción: </b><span id="div_des_'+vFila[1]+'">xxx</span> <br>';
+                vTabla += '<b>Definición: </b><span id="div_def_'+vFila[1]+'">xxx</span> <br>';
+                vTabla += '<b>Observación: </b><span id="div_obs_'+vFila[1]+'">xxx</span> <br>';
+                vTabla += '<b>Institución / Fuente: </b><span id="div_ins_'+vFila[1]+'">xxx</span> <br>';
+                vTabla += '<b>Escala: </b><span id="div_esc_'+vFila[1]+'">xxx</span> <br>';
+                vTabla += '</td><td></td></tr>';
             }
             $('#body_lista_indicadores').html(vTabla);
 
             var vTabla = '';
             for (var i = 0; i < Graficas._ListaIndicadoresC.length; i++) {                
                 var vFila = Graficas._ListaIndicadoresC[i];
-                vTabla += " <tr><td class='txt_verde' style='border: 1px solid black;vertical-align: middle;padding: 5px;   ' >"+vFila[0]+" ("+vFila[3]+")</td><td style='text-align: center;border: 1px solid black;vertical-align: middle;padding: 5px;'><input class='components'  type='checkbox'  id='"+vFila[1]+"' name='"+vFila[1]+"' value='0'></td></tr>";
+                vTabla += " <tr><td class='txt_verde' style='border-bottom: 1px solid #ccc;vertical-align: middle;padding: 5px;   ' >"+vFila[0]+" </td><td style='text-align: center;vertical-align: middle;padding: 5px;border-bottom: 1px solid #ccc;'><input class='components'  type='checkbox'  id='"+vFila[1]+"' name='"+vFila[1]+"' value='0'></td></tr>";
             }
             $('#body_lista_indicadoresC').html(vTabla);
         }
@@ -135,11 +189,27 @@
         }
     };
 
+
+    this.verInf = function(pId){
+        let objIndi = Mydata._infVariable.find(item => item[0] === pId);
+        $('#div_des_'+pId).html(objIndi[1]);
+        $('#div_def_'+pId).html(objIndi[2]);
+        $('#div_obs_'+pId).html(objIndi[3]);
+        $('#div_ins_'+pId).html(objIndi[4]);
+        $('#div_esc_'+pId).html(objIndi[5]);
+        $('#div_zoom_'+pId).show();
+    };
+    
+
+    this.ocultar = function(pId){
+        $('#div_zoom_'+pId).hide();
+    };
+
     this.cambioCh = function(pId){
         var vIsCh = $('#g_' + pId).is(':checked');
         if(vIsCh){
             if(Graficas._idGraficas.length >= 3){
-                alert('Ya ha marcado tres o mas indicadores para graficar');
+                alert('Ya ha marcado tres o más indicadores para graficar');
                 $('#g_' + pId).prop('checked', false);
                 return;                
             }
@@ -172,7 +242,7 @@
             var vData1 = Array();
             var vData2 = Array();
 
-            for (var i = 0; i < Graficas._datos.length; i++) {                
+            for (var i = 0; i < Graficas._datos.length; i++) {                                
                 var vFila = Graficas._datos[i];
                 if(i !=0){
                     vLabels.push(vFila[0] + " / " + vFila[1]);
@@ -316,19 +386,20 @@
             var vCh = '';
             var vLargo = 0;
             
+            
 
-            for (var i = 0; i < Graficas._datos.length; i++) {
+            for (var i = 0; i < Graficas._datosFormateados.length; i++) {
                 
-                var vItem = Graficas._datos[i];
+                var vItem = Graficas._datosFormateados[i];
                 if(i == 0){
                     vEnc += '	<tr>';
                     vCh += '	<tr style="text-align:center">';
                     vLargo = vItem.length;
                     for (var j = 0; j < vItem.length; j++) {
                         var vValor = vItem[j];
-                        vEnc += '<td class="header" style="border: 1px solid black;vertical-align: middle;padding: 5px;"><b>'+vValor+'</b></td>';
+                        vEnc += '<td class="header" style="border: 1px solid #CCCCCC;vertical-align: middle;padding: 5px;"><b>'+vValor+'</b></td>';
                         if(j>1){
-                            vCh += '<td stye="border: 1px solid black;vertical-align: middle;padding: 5px;"><input class="components"  type="checkbox"  id="g_'+j+'" name="g_'+j+'" value="0" onclick="Graficas.cambioCh('+j+')"></td>';
+                            vCh += '<td stye="border: 1px solid #CCCCCC;vertical-align: middle;padding: 5px;"><input class="components"  type="checkbox"  id="g_'+j+'" name="g_'+j+'" value="0" onclick="Graficas.cambioCh('+j+')"></td>';
                         }
                     }
                     vEnc += '	</tr>';
@@ -338,21 +409,23 @@
                     vFilas += '	<tr style="text-align:center">';
                     for (var j = 0; j < vItem.length; j++) {
                         var vValor = vItem[j];
-                        vFilas += '<td style=" '+((j==0 || j == 1)?' text-align:left; ':'')+' border: 1px solid black;vertical-align: middle;padding: 5px;">'+vValor+'</td>';
+                        vFilas += '<td style=" '+((j==0 || j == 1)?' text-align:left; ':'')+' border: 1px solid #CCCCCC !important ;vertical-align: middle;padding: 5px;">'+vValor+'</td>';
                     }
                     vFilas += '	</tr>';
                 }
                 vTabla += '<option value="' + vItem.Valor + '"  >' + vItem.Nombre + '</option>';
             }
 
-
+            
             var vTabla = '';
             vTabla += '<table id="TablaIndicadores" style="width: 100%; border-collapse: collapse font-size: 10px;">';
+            
+            
             vTabla += '<thead>';                               
             vTabla += '	<tr>  ';
             //vTabla += '		<td rowspan="2" colspan="2">&nbsp;</td>';   
             vTabla += '		<td rowspan="2" colspan="2" style="text-align: center;">';   
-            vTabla += '<img src="Content/excel.JPG" width="45" height="45" style="cursor: pointer;" onclick="General.ExportarExcel(\'TablaIndicadores\', \'Indicadores\')" >                   ';
+            vTabla += '<img src="Content/excel.JPG" width="45" border="0" height="45" style="cursor: pointer;" onclick="Graficas.Exportar();" >                   ';
             /*vTabla += '<button type="button" class="btn btn-success" onclick="General.ExportarExcel(\'TablaIndicadores\', \'Indicadores\')">';
             vTabla += '	<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-excel-fill" viewBox="0 0 16 16">';
             vTabla += '		<path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0zM9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1zM5.884 6.68 8 9.219l2.116-2.54a.5.5 0 1 1 .768.641L8.651 10l2.233 2.68a.5.5 0 0 1-.768.64L8 10.781l-2.116 2.54a.5.5 0 0 1-.768-.641L7.349 10 5.116 7.32a.5.5 0 1 1 .768-.64z" />';
@@ -361,11 +434,23 @@
             vTabla += '</button>';
             */
             vTabla += '		</td>';  
-            vTabla += '		<td colspan="'+(vLargo-2)+'" style="background-color:#83cceb; text-align: center;" ><b>¿QUÈ DESEA GRAFICAR? (Máximo tres gráficas) </b></td>';
+            vTabla += '		<td colspan="'+(vLargo-2)+'" style="background-color: #f97316; text-align: center; border-top-left-radius: 12px; padding: 8px; color: white;border-top-right-radius: 12px; padding: 8px; " ><b>¿QUÉ DESEA GRAFICAR? (Máximo tres gráficas) </b></td>';
             vTabla += '	</tr>  ';
             vTabla+= vCh ;
             vTabla+= vEnc ;
             vTabla+= vFilas ;
+            
+            if(Graficas._datosFormateados.length != 0){
+                let vTxt = Graficas._NombreDepto1 +" / " + Graficas._NombreMun1;
+                if(Graficas._NombreMun2 != ""){
+                    vTxt += ' Comprado con: ' + Graficas._NombreDepto2 + " / " + Graficas._NombreMun2;
+                }                 
+                vTabla += '<tr><td colspan="'+(vLargo+2)+'" >Fecha de Reporte: '+obtenerFechaHora()+'</td></tr>';
+                vTabla += '<tr><td colspan="'+(vLargo+2)+'" >Selección Filtros: '+vTxt+'</td></tr>';
+                vTabla += '<tr><td colspan="'+(vLargo+2)+'" >Fuente: Ministerio de Minas y Energía MME</td></tr>';
+            }
+                
+
             vTabla += '</table>';
             $('#div_tablaData').html(vTabla);
         } 
@@ -383,41 +468,56 @@
 
             let camposTabla = [];
             Graficas._NombresColumnas = Array();
+            Graficas._VisualDatos = Array();
 
-
+            //LLenar los campos seleccionados
             $("#body_lista_indicadores input[type=checkbox]:checked").each(function () {
                 seleccionados.push(this.id);
             });
+            //Llenar los compuestos seleccionados
             $("#body_lista_indicadoresC input[type=checkbox]:checked").each(function () {
                 seleccionadosC.push(this.id);
             });
 
+            //Si ha seleccionado alguno poner de primero departamento y municipio
             if(seleccionados.length != 0){
                 Graficas._NombresColumnas.push("DEPARTAMENTO");
                 Graficas._NombresColumnas.push("MUNICIPIO");
             }
 
+            //console.log(seleccionados);
+            //console.log(seleccionadosC);
+
             for (var i = 0; i < seleccionados.length; i++) {
+                //campo a campo seleccionados
                 let itemCampo = seleccionados[i] ;
+                //Inlcuir el campo seleccionado
                 camposTabla.push(itemCampo);
 
+                //Buscar la columna seleccionada para poner el resto de atributos
                 let objIndi = Graficas._ListaIndicadores.find(item => item[1] === itemCampo);
                 let nombre_columna = objIndi[0];
                 Graficas._NombresColumnas.push(nombre_columna);
-
+                //Incluir la funcion y numeros significativos
+                Graficas._VisualDatos.push([objIndi[2],objIndi[3]]);
+                //Sacar los compuestos asociados
                 let elemento = Graficas._AsoIndi.find(item => item[0] === itemCampo);
                 for (var j = 0; j < seleccionadosC.length; j++) {
                     let itemCampoC = seleccionadosC[j] ;                    
                     let vTieneProp =  elemento ? elemento[1].includes(itemCampoC) : false;
-                    if(vTieneProp){
+                    //Si tiene la propiedad
+                    if(vTieneProp){                        
                         let indC = Graficas._ListaIndicadoresC.find(item => item[1] === itemCampoC);
 
                         let vCampoCompuesto = (indC[2] == "PRE"? itemCampoC :"" )+  itemCampo + (indC[2] == "POS"? itemCampoC :"" );
                         camposTabla.push(vCampoCompuesto);
-                        let objIndi = Graficas._ListaIndicadoresC.find(item => item[1] === itemCampoC);
-                        let nombreCompu = (indC[2] == "PRE"? objIndi[3] :"" )+  nombre_columna + (indC[2] == "POS"? objIndi[3] :"" );
 
+                        let objIndi = Graficas._ListaIndicadoresC.find(item => item[1] === itemCampoC);
+                        //let nombreCompu = (indC[2] == "PRE"? objIndi[3] :"" )+  nombre_columna + (indC[2] == "POS"? objIndi[3] :"" );
+                        let nombreCompu =    objIndi[3]  + nombre_columna ;
+                        //LLenar el nombre del campo compuesto    
                         Graficas._NombresColumnas.push(nombreCompu);
+                        Graficas._VisualDatos.push([objIndi[4],objIndi[5]]);
 
                         
                     }
@@ -431,7 +531,8 @@
 
             //console.log(seleccionados);
             //console.log(seleccionadosC);
-           // console.log(camposTabla);
+            //console.log(camposTabla);
+            //console.log(Graficas._VisualDatos);
             //console.log(Graficas._NombresColumnas);
 
             Graficas._DatosTabla = camposTabla;
@@ -447,8 +548,13 @@
 
     this.limpiarIndicadores = function () {
         $("#offcanvas input[type='checkbox']").prop("checked", false);
+        Graficas._datos = Array();
+        Graficas._DatosTabla = Array();
         Graficas._idGraficas = Array();
+        Graficas._datosFormateados = Array();
+        Graficas.mostrarTabla();
         Graficas.graficar_lineas();    
+        
     };
 
 
@@ -464,10 +570,12 @@
                 return;
             }
 
+            //console.log(Graficas._DatosTabla);
 
+            //Determinar los indices de las columnas de los datos seleccionados    
             let vIndicesColumnas = Array();
-            for (var j = 0; j < Graficas._DatosTabla.length; j++) {
-                const indice = Mydata.Titulos.indexOf(Graficas._DatosTabla[j]);
+            for (var j = 0; j < Graficas._DatosTabla.length; j++) {                
+                const indice = Mydata.Titulos.indexOf(Graficas._DatosTabla[j]);                
                 if(indice != -1){
                     vIndicesColumnas.push(indice);
                 }
@@ -498,18 +606,54 @@
             //console.log(resultados);
             //console.log(vIndicesColumnas);
             Graficas._datos = Array();
+            Graficas._datosFormateados = Array();
             Graficas._datos.push(Graficas._NombresColumnas);
+            Graficas._datosFormateados.push(Graficas._NombresColumnas);
 
             for (var j = 0; j < resultados.length; j++) {
+                //console.log(Graficas._NombresColumnas);
+                //console.log(Graficas._VisualDatos);
                 let vFila = resultados[j];
                 let Fila = Array();
+                let FilaF = Array();
+                //Pone el nombre del departamento
                 Fila.push(vFila[1]);
+                FilaF.push(vFila[1]);
+                //Pone el nombre del municipio
                 Fila.push(vFila[3]);
+                FilaF.push(vFila[3]);
                 for (var i = 0; i < vIndicesColumnas.length; i++) {
-                    Fila.push(vFila[vIndicesColumnas[i]]);
+                    var vValorOriginal = vFila[vIndicesColumnas[i]];                    
+                    Fila.push(vValorOriginal);
+                    //console.log(vFila[vIndicesColumnas[i]]);
+                    //Formatear
+                    var vFuncion = Graficas._VisualDatos[i][0];
+                    var vCifras = Graficas._VisualDatos[i][1];
+                    var vValorFormateado = vValorOriginal;
+                    switch (vFuncion){
+                        case "F1":{
+                            vValorFormateado = F1_formatearNumeroCifrasSignificativas(vValorOriginal, Graficas._SimboloDecimal,  Graficas._SimboloMiles, vCifras);
+                        }break;
+                        case "F2":{                            
+                            vValorFormateado = F2_formatearNumeroCifrasSignificativasEnMillones(vValorOriginal, Graficas._SimboloDecimal,  Graficas._SimboloMiles, vCifras);                            
+                        }break;
+                        case "F3":{
+                            vValorFormateado = F3_formatearEnteroConSeparadores(vValorOriginal, Graficas._SimboloDecimal,  Graficas._SimboloMiles, Graficas._SimboloMillones);
+                        }break;
+                        case "F4":{
+                            vValorFormateado = F4_formatearNumeroCifrasSignificativasEnPorcentaje(vValorOriginal, Graficas._SimboloDecimal,  Graficas._SimboloMiles, vCifras);
+                        }break;
+
+                    }
+
+                    FilaF.push(vValorFormateado);
                 }
+
                 Graficas._datos.push(Fila);
+                Graficas._datosFormateados.push(FilaF);
             }
+            //console.log(Graficas._datosFormateados);
+
 
 /*
             alert('Ok');
@@ -540,4 +684,41 @@
             return false;
         }
     };
+
+    this.Exportar = function(){
+        if(Graficas._DatosTabla.length == 0){
+            alert('No hay indicadores seleccionados para visualizar y exportar');
+            return;
+        }  
+
+        const tablaOriginal = document.getElementById("TablaIndicadores");
+        const tablaClonada = tablaOriginal.cloneNode(true);
+
+        // Eliminamos las dos primeras filas
+        tablaClonada.deleteRow(0); // fila 0
+        tablaClonada.deleteRow(0); // la fila 1 original ahora es la 0 tras eliminar
+
+         // 2. Convertimos a worksheet
+        const ws = XLSX.utils.table_to_sheet(tablaClonada);
+
+        // 3. Aplicamos negrita a la primera columna
+        const rango = XLSX.utils.decode_range(ws['!ref']);
+        for (let row = rango.s.r; row <= rango.e.r; row++) {
+            const cellAddress = { r: row, c: 0 }; // columna A (índice 0)
+            const cellRef = XLSX.utils.encode_cell(cellAddress);
+            if (ws[cellRef]) {
+            ws[cellRef].s = {
+                font: { bold: true }
+            };
+            }
+        }
+
+        // 4. Creamos libro y añadimos hoja
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "TablaIndicadores");
+
+        // Descargamos el archivo
+        XLSX.writeFile(wb, "TablaIndicadores.xlsx", { cellStyles: true });
+        
+    }
 };

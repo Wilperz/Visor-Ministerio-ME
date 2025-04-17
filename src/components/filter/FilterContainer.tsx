@@ -5,7 +5,8 @@ import { ComparisonFilter } from './ComparisonFilter';
 import { ActionButtons } from './ActionButtons';
 import type { FilterOption } from '../../types/filters';
 import type { Municipality } from '../../types/municipality';
-import { fetchMunicipalityData } from '../../lib/api';
+import { fetchMunicipalityData_Sb, fetchMunicipalityData_Python } from '../../lib/api';
+import { APP_CONFIG } from '../../config/app';
 
 interface FilterContainerProps {
   onSearch: (features: any[], municipalities: Municipality[], selectedDeterminants: Set<string>) => void;
@@ -25,6 +26,7 @@ export function FilterContainer({
   const [comparisonMunicipality, setComparisonMunicipality] = useState<FilterOption | null>(null);
   const [wantComparison, setWantComparison] = useState(false);
   const [currentDeterminants, setCurrentDeterminants] = useState<Set<string>>(new Set());
+  const [indicadoresTerritorial, setIndicadoresTerritorial] = useState<any>({});
 
   const handleDeterminantsChange = useCallback((determinants: Set<string>) => {
     setCurrentDeterminants(determinants);
@@ -42,8 +44,11 @@ export function FilterContainer({
 
   const handleSearch = async () => {
     if (!selectedDepartment || !selectedMunicipality) return;
+    let enrichedDataArray: any[] = [];
+    let fetatureData: any[] = [];
+    let featureComparison: any[] = [];
 
-    // Generate DatosMuniDpto array with padded codes
+    // Generate DatosMuniDpto array with padded codes for Fredy App
     const DatosMuniDpto = [
       padDepartmentCode(selectedDepartment.id),
       selectedMunicipality.id === 'all' ? '-1' : padMunicipalityCode(selectedMunicipality.id),
@@ -52,37 +57,64 @@ export function FilterContainer({
         comparisonMunicipality.id === 'all' ? '-1' : padMunicipalityCode(comparisonMunicipality.id) 
         : '0'
     ].join(',');
+    console.log("DatosMuniDpto:",DatosMuniDpto)
 
-    // Call the global function if it exists
-    //TODO
     if (typeof window !== 'undefined' && (window as any).GenerarReporte) {
       (window as any).GenerarReporte(DatosMuniDpto);
     }
-    
 
     try {
-      // Only fetch and update main viewer data if comparison is not enabled
-      if (!wantComparison) {
-        const data = await fetchMunicipalityData(
+      // Fetch territorial indicators
+      //TODO send for Fredy App
+      if (APP_CONFIG.apiPython) {
+        const response = await fetch(`${APP_CONFIG.pythonApiUrl}/indicadores-territorial`);
+        const dataIndicadores = await response.json();
+        setIndicadoresTerritorial(dataIndicadores.indicadores);
+      }
+
+      // Handle main municipality data
+      let data;
+      if (APP_CONFIG.apiPython) {
+        data = await fetchMunicipalityData_Python(
           selectedDepartment.id,
           selectedMunicipality.name
         );
+      } else {
+        data = await fetchMunicipalityData_Sb(
+          selectedDepartment.id,
+          selectedMunicipality.name
+        );
+      }
 
-        if (data) {
-          onSearch(data.features, data.enrichedData, currentDeterminants);
+      if (data) {
+        data.enrichedData.forEach((value) => enrichedDataArray.push(value));
+        fetatureData = data.features;
+      }
+
+      // Handle comparison data if enabled
+      if (wantComparison && comparisonDepartment && comparisonMunicipality) {
+        let comparisonData;
+        if (APP_CONFIG.apiPython) {
+          comparisonData = await fetchMunicipalityData_Python(
+            comparisonDepartment.id,
+            comparisonMunicipality.name
+          );
+        } else {
+          comparisonData = await fetchMunicipalityData_Sb(
+            comparisonDepartment.id,
+            comparisonMunicipality.name
+          );
+        }
+
+        if (comparisonData) {
+          comparisonData.enrichedData.forEach((value) => enrichedDataArray.push(value));
+          featureComparison = comparisonData.features;
         }
       }
 
-      // Always fetch comparison data if comparison is enabled
-      if (wantComparison && comparisonDepartment && comparisonMunicipality) {
-        const comparisonData = await fetchMunicipalityData(
-          comparisonDepartment.id,
-          comparisonMunicipality.name
-        );
-
-        if (comparisonData) {
-          onComparisonSearch(comparisonData.features, comparisonData.enrichedData);
-        }
+      onSearch(fetatureData, enrichedDataArray, currentDeterminants);
+      if (featureComparison.length > 0) {
+        onComparisonSearch(featureComparison, enrichedDataArray);
       }
     } catch (error) {
       console.error('Error during search:', error);
@@ -97,6 +129,7 @@ export function FilterContainer({
     setComparisonMunicipality(null);
     setWantComparison(false);
     setCurrentDeterminants(new Set());
+    setIndicadoresTerritorial({});
     
     // Clear determinants using the exposed window method
     if (typeof window !== 'undefined' && (window as any).clearDeterminants) {

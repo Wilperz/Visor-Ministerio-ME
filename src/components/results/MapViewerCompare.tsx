@@ -93,20 +93,13 @@ export function MapViewerCompare({
         })
       );
 
-      if (!disableAutoZoom && mapInstanceRef.current) {
+      if (mapInstanceRef.current) {
         const extent = vectorSourceRef.current.getExtent();
         const view = mapInstanceRef.current.getView();
-        const currentZoom = view.getZoom();
-        const currentCenter = view.getCenter();
-
-        if (currentZoom === 6 && currentCenter && 
-            currentCenter[0] === fromLonLat([-74.2973, 4.5709])[0] && 
-            currentCenter[1] === fromLonLat([-74.2973, 4.5709])[1]) {
-          view.fit(extent, {
-            padding: [50, 50, 50, 50],
-            duration: 1000
-          });
-        }
+        view.fit(extent, {
+          padding: [50, 50, 50, 50],
+          duration: 1000
+        });
       }
     }
   }, [features, disableAutoZoom]);

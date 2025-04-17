@@ -3,7 +3,7 @@ import { Listbox, Transition } from '@headlessui/react';
 import { ChevronDown } from 'lucide-react';
 import type { FilterOption } from '../../types/filters';
 import { ZONES, DEPARTMENTS } from '../../config/constants';
-import { supabase } from '../../lib/supabase';
+import { fetchMunicipalitiesByDepartment } from '../../lib/api';
 
 interface MunicipalityFilterProps {
   selectedZone: FilterOption | null;
@@ -12,11 +12,6 @@ interface MunicipalityFilterProps {
   onZoneChange: (zone: FilterOption | null) => void;
   onDepartmentChange: (department: FilterOption | null) => void;
   onMunicipalityChange: (municipality: FilterOption | null) => void;
-}
-
-interface Municipality {
-  mpio_cnmbr: string;
-  mpio_cdpmp: string;
 }
 
 export function MunicipalityFilter({
@@ -32,67 +27,38 @@ export function MunicipalityFilter({
   // Filter departments based on selected zone and sort them
   const filteredDepartments = selectedZone
     ? selectedZone.id === 'pais'
-      ? // If "País" is selected, show all unique departments
-        Array.from(
+      ? Array.from(
           new Map(
             DEPARTMENTS.map(dept => [dept.id, dept])
           ).values()
         ).sort((a, b) => a.name.localeCompare(b.name))
-      : // Otherwise, filter by zone
-        DEPARTMENTS.filter(dept => dept.zone === selectedZone.id)
+      : DEPARTMENTS.filter(dept => dept.zone === selectedZone.id)
           .sort((a, b) => a.name.localeCompare(b.name))
     : [];
 
   useEffect(() => {
-    async function fetchMunicipalities() {
+    async function loadMunicipalities() {
       if (selectedDepartment) {
-        const { data, error } = await supabase
-          .from('div_territorial_zonas')
-          .select('mpio_cdpmp, mpio_cnmbr')
-          .eq('dpto_ccdgo', selectedDepartment.id)
-          .order('mpio_cnmbr');
-
-        if (error) {
-          console.error('Error fetching municipalities:', error);
-          return;
-        }
-
-        if (data) {
-          // Create a Map to store unique municipalities
-          const uniqueMunicipalities = new Map<string, Municipality>();
-          
-          // Only keep the first occurrence of each mpio_cdpmp
-          data.forEach((muni: Municipality) => {
-            if (!uniqueMunicipalities.has(muni.mpio_cdpmp)) {
-              uniqueMunicipalities.set(muni.mpio_cdpmp, muni);
-            }
-          });
-
-          const municipalityOptions: FilterOption[] = [
-            { id: 'all', name: 'Todos' },
-            ...Array.from(uniqueMunicipalities.values())
-              .map((muni: Municipality) => ({
-                id: muni.mpio_cdpmp,
-                name: muni.mpio_cnmbr
-              }))
-              .sort((a, b) => a.name.localeCompare(b.name))
-          ];
-
+        try {
+          const municipalityOptions = await fetchMunicipalitiesByDepartment(selectedDepartment.id);
           setMunicipalities(municipalityOptions);
+        } catch (error) {
+          console.error('Error loading municipalities:', error);
+          setMunicipalities([]);
         }
       } else {
         setMunicipalities([]);
       }
     }
 
-    fetchMunicipalities();
+    loadMunicipalities();
   }, [selectedDepartment]);
 
   return (
     <div className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Seleccione Zona o Lista Recurrente
+          Zona
         </label>
         <Listbox value={selectedZone} onChange={(value) => {
           onZoneChange(value);

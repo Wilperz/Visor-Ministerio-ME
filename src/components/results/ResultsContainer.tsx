@@ -1,7 +1,7 @@
 import { MapViewer } from './MapViewer';
 import { MapViewerCompare } from './MapViewerCompare';
 import { ResultsTable } from './ResultsTable';
-import type { Map } from 'ol';
+
 import type { Municipality } from '../../types/municipality';
 
 interface ResultsContainerProps {
@@ -9,8 +9,6 @@ interface ResultsContainerProps {
   comparisonFeatures: any[];
   displayedMunicipalities: Municipality[];
   selectedDeterminants: Set<string>;
-  onMainMapInit: (map: Map) => void;
-  onSecondaryMapInit: (map: Map) => void;
 }
 
 export function ResultsContainer({
@@ -18,8 +16,6 @@ export function ResultsContainer({
   comparisonFeatures,
   displayedMunicipalities,
   selectedDeterminants,
-  onMainMapInit,
-  onSecondaryMapInit
 }: ResultsContainerProps) {
   return (
     <div className="flex-1 flex flex-col">
@@ -30,7 +26,7 @@ export function ResultsContainer({
             <h2 className="text-lg font-semibold text-white">Mapa Principal</h2>
           </div>
           <div className="p-2 h-[calc(100%-2rem)]">
-            <MapViewerCompare
+          <MapViewerCompare
               features={displayedFeatures}
               className="h-full rounded-lg shadow-lg overflow-hidden"
             />
@@ -43,11 +39,10 @@ export function ResultsContainer({
             <h2 className="text-lg font-semibold text-white">Mapa de Comparación</h2>
           </div>
           <div className="p-2 h-[calc(100%-2rem)]">
-            <MapViewer
-              features={comparisonFeatures}
-              className="h-full rounded-lg shadow-lg overflow-hidden"
-              onMapInit={onMainMapInit}
-            />
+          <MapViewerCompare
+            features={comparisonFeatures}
+            className="h-full rounded-lg shadow-lg overflow-hidden"
+          />
           </div>
         </div>
       </div>

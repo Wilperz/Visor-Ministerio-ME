@@ -47,7 +47,7 @@ Mensaje = new function () {
         }
     };
 
-    this.seguimientoObjeto = function (pDato) {
+    this.seguimientoObjeto = function (pDato) {        
         console.log(JSON.stringify(pDato));
     };
 };

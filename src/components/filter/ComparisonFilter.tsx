@@ -3,7 +3,7 @@ import { Listbox, Transition } from '@headlessui/react';
 import { ChevronDown } from 'lucide-react';
 import type { FilterOption } from '../../types/filters';
 import { DEPARTMENTS } from '../../config/constants';
-import { supabase } from '../../lib/supabase';
+import { fetchMunicipalitiesByDepartment } from '../../lib/api';
 
 interface ComparisonFilterProps {
   enabled: boolean;
@@ -12,11 +12,6 @@ interface ComparisonFilterProps {
   onEnableChange: (enabled: boolean) => void;
   onDepartmentChange: (department: FilterOption | null) => void;
   onMunicipalityChange: (municipality: FilterOption | null) => void;
-}
-
-interface Municipality {
-  mpio_cnmbr: string;
-  mpio_cdpmp: string;
 }
 
 export function ComparisonFilter({
@@ -37,48 +32,21 @@ export function ComparisonFilter({
   ).sort((a, b) => a.name.localeCompare(b.name));
 
   useEffect(() => {
-    async function fetchMunicipalities() {
+    async function loadMunicipalities() {
       if (selectedDepartment) {
-        const { data, error } = await supabase
-          .from('div_territorial_zonas')
-          .select('mpio_cdpmp, mpio_cnmbr')
-          .eq('dpto_ccdgo', selectedDepartment.id)
-          .order('mpio_cnmbr');
-
-        if (error) {
-          console.error('Error fetching comparison municipalities:', error);
-          return;
-        }
-
-        if (data) {
-          // Create a Map to store unique municipalities
-          const uniqueMunicipalities = new Map<string, Municipality>();
-          
-          // Only keep the first occurrence of each mpio_cdpmp
-          data.forEach((muni: Municipality) => {
-            if (!uniqueMunicipalities.has(muni.mpio_cdpmp)) {
-              uniqueMunicipalities.set(muni.mpio_cdpmp, muni);
-            }
-          });
-
-          const municipalityOptions: FilterOption[] = [
-            { id: 'all', name: 'Todos' },
-            ...Array.from(uniqueMunicipalities.values())
-              .map((muni: Municipality) => ({
-                id: muni.mpio_cdpmp,
-                name: muni.mpio_cnmbr
-              }))
-              .sort((a, b) => a.name.localeCompare(b.name))
-          ];
-
+        try {
+          const municipalityOptions = await fetchMunicipalitiesByDepartment(selectedDepartment.id);
           setMunicipalities(municipalityOptions);
+        } catch (error) {
+          console.error('Error loading comparison municipalities:', error);
+          setMunicipalities([]);
         }
       } else {
         setMunicipalities([]);
       }
     }
 
-    fetchMunicipalities();
+    loadMunicipalities();
   }, [selectedDepartment]);
 
   return (
