@@ -8,6 +8,8 @@ export const ZONES = [
   { id: 'insular', name: 'Región Insular' },
   { id: 'orinoquia', name: 'Región Orinoquía' },
   { id: 'pacifica', name: 'Región Pacífica' },
+  { id: 'ZOMAC', name: 'ZOMAC' },
+  //{ id: 'PDET', name: 'PDET' },
   { id: 'pais', name: 'País' }
 ].sort((a, b) => a.name.localeCompare(b.name));
 
@@ -85,5 +87,37 @@ export const DEPARTMENTS = [
   { id: '88', name: 'ARCHIPIÉLAGO DE SAN ANDRÉS PROVIDENCIA', zone: 'estructura_3' },
   { id: '18', name: 'CAQUETÁ', zone: 'estructura_3' },
   { id: '91', name: 'AMAZONAS', zone: 'estructura_3' },
-  { id: '94', name: 'GUAINÍA', zone: 'estructura_3' }
+  { id: '94', name: 'GUAINÍA', zone: 'estructura_3' },
+
+  //Zomac
+  { id: '05', name: 'ANTIOQUIA', zone: 'ZOMAC' },
+  { id: '13', name: 'BOLÍVAR', zone: 'ZOMAC' },
+  { id: '15', name: 'BOYACÁ', zone: 'ZOMAC' },
+  { id: '17', name: 'CALDAS', zone: 'ZOMAC' },
+  { id: '18', name: 'CAQUETÁ', zone: 'ZOMAC' },
+  { id: '19', name: 'CAUCA', zone: 'ZOMAC' },
+  { id: '20', name: 'CESAR', zone: 'ZOMAC' },
+  { id: '23', name: 'CÓRDOBA', zone: 'ZOMAC' },
+  { id: '25', name: 'CUNDINAMARCA', zone: 'ZOMAC' },
+  { id: '27', name: 'CHOCÓ', zone: 'ZOMAC' },
+  { id: '41', name: 'HUILA', zone: 'ZOMAC' },
+  { id: '44', name: 'LA GUAJIRA', zone: 'ZOMAC' },
+  { id: '47', name: 'MAGDALENA', zone: 'ZOMAC' },
+  { id: '50', name: 'META', zone: 'ZOMAC' },
+  { id: '52', name: 'NARIÑO', zone: 'ZOMAC' },
+  { id: '54', name: 'NORTE DE SANTANDER', zone: 'ZOMAC' },
+  { id: '63', name: 'QUINDIO', zone: 'ZOMAC' },
+  { id: '66', name: 'RISARALDA', zone: 'ZOMAC' },
+  { id: '68', name: 'SANTANDER', zone: 'ZOMAC' },
+  { id: '70', name: 'SUCRE', zone: 'ZOMAC' },
+  { id: '73', name: 'TOLIMA', zone: 'ZOMAC' },
+  { id: '76', name: 'VALLE DEL CAUCA', zone: 'ZOMAC' },
+  { id: '81', name: 'ARAUCA', zone: 'ZOMAC' },
+  { id: '85', name: 'CASANARE', zone: 'ZOMAC' },
+  { id: '86', name: 'PUTUMAYO', zone: 'ZOMAC' },
+  { id: '95', name: 'GUAVIARE', zone: 'ZOMAC' },
+  { id: '97', name: 'VAUPÉS', zone: 'ZOMAC' },
+  { id: '99', name: 'VICHADA', zone: 'ZOMAC' },
+
+
 ].sort((a, b) => a.name.localeCompare(b.name));
