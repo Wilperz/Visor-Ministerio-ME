@@ -58,7 +58,7 @@ export function MunicipalityFilter({
     <div className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-        Seleccione Zona o Lista Recurrente
+          Seleccione Zona o Lista Recurrente
         </label>
         <Listbox value={selectedZone} onChange={(value) => {
           onZoneChange(value);

@@ -31,27 +31,48 @@ export async function fetchMunicipalityData_Sb(
   municipalityName: string | null
 ) {
   try {
-    let territorialQuery = supabase
-      .from('div_territorial_zonas')
-      .select('id_grilla, mpio_cdpmp, dpto_cnmbr, mpio_cnmbr')
-      .eq('dpto_ccdgo', departmentId);
+    // Initialize arrays to store all data
+    let allTerritorialData: any[] = [];
+    let hasMore = true;
+    let page = 0;
+    const pageSize = 1000;
 
-    // Only add municipality filter if not "Todos"
-    if (municipalityName && municipalityName !== 'Todos') {
-      territorialQuery = territorialQuery.eq('mpio_cnmbr', municipalityName);
+    // Fetch territorial data with pagination
+    while (hasMore) {
+      let territorialQuery = supabase
+        .from('div_territorial_zonas')
+        .select('id_grilla, mpio_cdpmp, dpto_cnmbr, mpio_cnmbr')
+        .eq('dpto_ccdgo', departmentId)
+        .order('mpio_cnmbr')
+        .range(page * pageSize, (page + 1) * pageSize - 1);
+
+      // Only add municipality filter if not "Todos"
+      if (municipalityName && municipalityName !== 'Todos') {
+        territorialQuery = territorialQuery.eq('mpio_cnmbr', municipalityName);
+      }
+
+      const { data: territorialData, error: territorialError } = await territorialQuery;
+
+      if (territorialError) {
+        console.error('Error fetching territorial data:', territorialError.message);
+        throw territorialError;
+      }
+
+      if (territorialData && territorialData.length > 0) {
+        allTerritorialData = [...allTerritorialData, ...territorialData];
+        if (territorialData.length < pageSize) {
+          hasMore = false;
+        }
+      } else {
+        hasMore = false;
+      }
+
+      page++;
     }
 
-    const { data: territorialData, error: territorialError } = await territorialQuery
-      .order('mpio_cnmbr');
-
-    if (territorialError) {
-      console.error('Error fetching territorial data:', territorialError.message);
-      throw territorialError;
-    }
-
-    if (territorialData && territorialData.length > 0) {
+    if (allTerritorialData.length > 0) {
       // Get unique mpio_cdpmp values and ensure they are padded to 5 digits
-      const uniqueMpioCdpmp = [...new Set(territorialData.map(item => padMunicipalityCode(item.mpio_cdpmp)))];
+      const uniqueMpioCdpmp = [...new Set(allTerritorialData.map(item => padMunicipalityCode(item.mpio_cdpmp)))];
 
       // Fetch determinant data for all municipalities
       const { data: determinantData, error: determinantError } = await supabase
@@ -64,7 +85,7 @@ export async function fetchMunicipalityData_Sb(
         throw determinantError;
       }
 
-      const gridIds = territorialData.map(item => item.id_grilla);
+      const gridIds = allTerritorialData.map(item => item.id_grilla);
       const { data: municipiosData, error: municipiosError } = await supabase
         .from('municipios')
         .select('*')
@@ -80,17 +101,21 @@ export async function fetchMunicipalityData_Sb(
           type: 'Feature',
           geometry: muni.geom,
           properties: {
-            nombre_municipio: muni.nombre_municipio,
+            text: muni.mpio_cnmbr,
+            idMunicipio: muni.mpio_cdpmp,
+            Municipio: muni.mpio_cnmbr,
+            idDepartamento: departmentId,
+            Departamento: allTerritorialData.find(t => t.id_grilla === muni.id_grilla)?.dpto_cnmbr,
             ...Object.fromEntries(
               DETERMINANTS.map(det => [det.columnName, determinantData.find(d => 
-                d.mpio_cdpmp === padMunicipalityCode(territorialData.find(t => t.id_grilla === muni.id_grilla)?.mpio_cdpmp || '')
+                d.mpio_cdpmp === padMunicipalityCode(allTerritorialData.find(t => t.id_grilla === muni.id_grilla)?.mpio_cdpmp || '')
               )?.[det.columnName] || 0])
             )
           }
         }));
 
         const enrichedData = determinantData.map(det => {
-          const territorial = territorialData.find(t => padMunicipalityCode(t.mpio_cdpmp) === det.mpio_cdpmp);
+          const territorial = allTerritorialData.find(t => padMunicipalityCode(t.mpio_cdpmp) === det.mpio_cdpmp);
           return {
             ...det,
             mpio_cnmbr: territorial?.mpio_cnmbr || det.mpio_cnmbr,
@@ -109,7 +134,6 @@ export async function fetchMunicipalityData_Sb(
 }
 
 export async function fetchInitialMunicipios() {
-  console.log("**fetchInitialMunicipios")
   try {
     if (APP_CONFIG.apiPython) {
       const response = await fetch(`${APP_CONFIG.pythonApiUrl}/initial-municipios`);
@@ -119,18 +143,31 @@ export async function fetchInitialMunicipios() {
       return await response.json();
     } else {
       const { data, error } = await supabase
-        .from('municipios')
-        .select('*')
-        .limit(1);
+        .from('div_territorial_municipios')
+        .select('geom, mpio_cdpmp, mpio_cnmbr, dpto_ccdgo, dpto_cnmbr')
+        .limit(500);
 
       if (error) {
         throw error;
       }
-
-      return data.map(muni => ({
+      console.log("data municipio", data);
+      return data.map(muni => ({        
         type: 'Feature',
         geometry: muni.geom,
-        properties: {}
+        properties: {          
+          text: muni.mpio_cnmbr,
+          idMunicipio: muni.mpio_cdpmp,
+          Municipio: muni.mpio_cnmbr,
+          idDepartamento: muni.dpto_ccdgo,
+          Departamento: muni.dpto_cnmbr,
+          textStyle: {
+            font: '12px Arial',
+            fill: '#000',
+            stroke: '#fff',
+            strokeWidth: 3,
+            offsetY: -15
+          }
+        }
       }));
     }
   } catch (error) {

@@ -17,18 +17,20 @@ interface MapViewerCompareProps {
   className?: string;
   onMapInit?: (map: Map) => void;
   disableAutoZoom?: boolean;
+  showPrintButton?: boolean;
 }
 
 export function MapViewerCompare({ 
   features = [], 
   className = '', 
   onMapInit,
-  disableAutoZoom = false 
+  disableAutoZoom = false,
+  showPrintButton = false
 }: MapViewerCompareProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<Map | null>(null);
   const vectorSourceRef = useRef<VectorSource | null>(null);
-  const featuresRef = useRef<any[]>(features);
+  const vectorLayerRef = useRef<VectorLayer<VectorSource> | null>(null);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -48,6 +50,7 @@ export function MapViewerCompare({
         })
       })
     });
+    vectorLayerRef.current = vectorLayer;
 
     const map = new Map({
       target: mapRef.current,
@@ -75,12 +78,13 @@ export function MapViewerCompare({
   }, [onMapInit]);
 
   useEffect(() => {
-    if (!vectorSourceRef.current || features === featuresRef.current) return;
+    if (!vectorSourceRef.current) return;
 
-    featuresRef.current = features;
+    // Clear existing features
+    vectorSourceRef.current.clear();
 
-    if (features.length > 0) {
-      vectorSourceRef.current.clear();
+    // Only add new features if there are any
+    if (features && features.length > 0) {
       const geoJsonData = {
         type: 'FeatureCollection',
         features
@@ -93,13 +97,20 @@ export function MapViewerCompare({
         })
       );
 
-      if (mapInstanceRef.current) {
+      if (mapInstanceRef.current && !disableAutoZoom) {
         const extent = vectorSourceRef.current.getExtent();
         const view = mapInstanceRef.current.getView();
         view.fit(extent, {
           padding: [50, 50, 50, 50],
           duration: 1000
         });
+      }
+    } else {
+      // If no features, reset the view to default
+      if (mapInstanceRef.current) {
+        const view = mapInstanceRef.current.getView();
+        view.setCenter(fromLonLat([-74.2973, 4.5709]));
+        view.setZoom(6);
       }
     }
   }, [features, disableAutoZoom]);
@@ -182,13 +193,15 @@ export function MapViewerCompare({
   return (
     <div className="relative h-full">
       <div ref={mapRef} className={className} />
-      <button
-        onClick={handlePrint}
-        className="absolute top-4 right-4 z-10 bg-white p-2 rounded-lg shadow-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
-        title="Imprimir mapa"
-      >
-        <Printer className="h-5 w-5 text-gray-600" />
-      </button>
+      {showPrintButton && (
+        <button
+          onClick={handlePrint}
+          className="absolute top-4 right-4 z-10 bg-white p-2 rounded-lg shadow-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+          title="Imprimir mapa"
+        >
+          <Printer className="h-5 w-5 text-gray-600" />
+        </button>
+      )}
     </div>
   );
 }

@@ -12,16 +12,25 @@ interface FilterContainerProps {
   onSearch: (features: any[], municipalities: Municipality[], selectedDeterminants: Set<string>) => void;
   onComparisonSearch: (features: any[], municipalities: Municipality[]) => void;
   onClear: () => void;
+  selectedZone: FilterOption | null;
+  selectedDepartment: FilterOption | null;
+  selectedMunicipality: FilterOption | null;
+  onZoneChange: (zone: FilterOption | null) => void;
+  onDepartmentChange: (department: FilterOption | null) => void;
+  onMunicipalityChange: (municipality: FilterOption | null) => void;
 }
 
 export function FilterContainer({
   onSearch,
   onComparisonSearch,
-  onClear
+  onClear,
+  selectedZone,
+  selectedDepartment,
+  selectedMunicipality,
+  onZoneChange,
+  onDepartmentChange,
+  onMunicipalityChange
 }: FilterContainerProps) {
-  const [selectedZone, setSelectedZone] = useState<FilterOption | null>(null);
-  const [selectedDepartment, setSelectedDepartment] = useState<FilterOption | null>(null);
-  const [selectedMunicipality, setSelectedMunicipality] = useState<FilterOption | null>(null);
   const [comparisonDepartment, setComparisonDepartment] = useState<FilterOption | null>(null);
   const [comparisonMunicipality, setComparisonMunicipality] = useState<FilterOption | null>(null);
   const [wantComparison, setWantComparison] = useState(false);
@@ -58,10 +67,9 @@ export function FilterContainer({
         : '0'
     ].join(',');
     console.log("DatosMuniDpto:",DatosMuniDpto)
-
     if (typeof window !== 'undefined' && (window as any).GenerarReporte) {
-      (window as any).GenerarReporte(DatosMuniDpto);
-    }
+      (window as any).GenerarReporte(DatosMuniDpto); 
+    }   
 
     try {
       // Fetch territorial indicators
@@ -121,10 +129,7 @@ export function FilterContainer({
     }
   };
 
-  const handleClear = () => {
-    setSelectedZone(null);
-    setSelectedDepartment(null);
-    setSelectedMunicipality(null);
+  const handleClearLocal = () => {
     setComparisonDepartment(null);
     setComparisonMunicipality(null);
     setWantComparison(false);
@@ -146,9 +151,9 @@ export function FilterContainer({
           selectedZone={selectedZone}
           selectedDepartment={selectedDepartment}
           selectedMunicipality={selectedMunicipality}
-          onZoneChange={setSelectedZone}
-          onDepartmentChange={setSelectedDepartment}
-          onMunicipalityChange={setSelectedMunicipality}
+          onZoneChange={onZoneChange}
+          onDepartmentChange={onDepartmentChange}
+          onMunicipalityChange={onMunicipalityChange}
         />
 
         <DeterminantsFilter onSelectionChange={handleDeterminantsChange} />
@@ -164,7 +169,7 @@ export function FilterContainer({
 
         <ActionButtons
           onSearch={handleSearch}
-          onClear={handleClear}
+          onClear={handleClearLocal}
           disabled={!selectedMunicipality || (wantComparison && !comparisonMunicipality)}
         />
       </div>

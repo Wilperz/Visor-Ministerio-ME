@@ -9,6 +9,12 @@ interface ResultsContainerProps {
   comparisonFeatures: any[];
   displayedMunicipalities: Municipality[];
   selectedDeterminants: Set<string>;
+  onMunicipalityQuery: (municipalityData: {
+    municipalityId: string;
+    municipalityName: string;
+    departmentId: string;
+    departmentName: string;
+  }) => void;
 }
 
 export function ResultsContainer({
@@ -16,7 +22,15 @@ export function ResultsContainer({
   comparisonFeatures,
   displayedMunicipalities,
   selectedDeterminants,
+  onMunicipalityQuery
 }: ResultsContainerProps) {
+  // Only show print button when there are features AND they're not the initial load features
+  const showPrintButton = displayedFeatures.length > 0 && 
+    displayedFeatures.some(feature => !feature.properties?.textStyle);
+
+  // Only show comparison print button when there are comparison features
+  const showComparisonPrintButton = comparisonFeatures.length > 0;
+
   return (
     <div className="flex-1 flex flex-col">
       <div className="flex-1 flex">
@@ -26,9 +40,11 @@ export function ResultsContainer({
             <h2 className="text-lg font-semibold text-white">Mapa Principal</h2>
           </div>
           <div className="p-2 h-[calc(100%-2rem)]">
-          <MapViewerCompare
+            <MapViewer
               features={displayedFeatures}
               className="h-full rounded-lg shadow-lg overflow-hidden"
+              onMunicipalityQuery={onMunicipalityQuery}
+              showPrintButton={showPrintButton}
             />
           </div>
         </div>
@@ -39,10 +55,11 @@ export function ResultsContainer({
             <h2 className="text-lg font-semibold text-white">Mapa de Comparación</h2>
           </div>
           <div className="p-2 h-[calc(100%-2rem)]">
-          <MapViewerCompare
-            features={comparisonFeatures}
-            className="h-full rounded-lg shadow-lg overflow-hidden"
-          />
+            <MapViewerCompare
+              features={comparisonFeatures}
+              className="h-full rounded-lg shadow-lg overflow-hidden"
+              showPrintButton={showComparisonPrintButton}
+            />
           </div>
         </div>
       </div>
