@@ -8,11 +8,11 @@ function padMunicipalityCode(code: string): string {
   return code.padStart(5, '0');
 }
 
-export async function fetchMunicipalityData_Python(departmentId: string, municipalityName: string | null) {
+export async function fetchMunicipalityData_Python(departmentId: string, municipalityId: string | null) {
   try {
     const url = new URL(`${APP_CONFIG.pythonApiUrl}/municipality-data/${departmentId}`);
-    if (municipalityName && municipalityName !== 'Todos') {
-      url.searchParams.append('municipality_name', municipalityName);
+    if (municipalityId && municipalityId !== '-1') {
+      url.searchParams.append('municipality_id', municipalityId);
     }
 
     const response = await fetch(url.toString());
@@ -28,7 +28,7 @@ export async function fetchMunicipalityData_Python(departmentId: string, municip
 
 export async function fetchMunicipalityData_Sb(
   departmentId: string,
-  municipalityName: string | null
+  municipalityId: string | null
 ) {
   try {
     // Initialize arrays to store all data
@@ -47,8 +47,8 @@ export async function fetchMunicipalityData_Sb(
         .range(page * pageSize, (page + 1) * pageSize - 1);
 
       // Only add municipality filter if not "Todos"
-      if (municipalityName && municipalityName !== 'Todos') {
-        territorialQuery = territorialQuery.eq('mpio_cnmbr', municipalityName);
+      if (municipalityId && municipalityId !== '-1') {
+        territorialQuery = territorialQuery.eq('mpio_cdpmp', municipalityId);
       }
 
       const { data: territorialData, error: territorialError } = await territorialQuery;

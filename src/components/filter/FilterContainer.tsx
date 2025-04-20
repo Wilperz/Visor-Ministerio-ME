@@ -83,14 +83,22 @@ export function FilterContainer({
       // Handle main municipality data
       let data;
       if (APP_CONFIG.apiPython) {
+        let codMunicipality = '-1'
+        if (selectedMunicipality && selectedMunicipality.name !== 'Todos'){
+             codMunicipality = selectedMunicipality.id
+        }   
         data = await fetchMunicipalityData_Python(
           selectedDepartment.id,
-          selectedMunicipality.name
+          selectedMunicipality.id
         );
       } else {
+        let codMunicipality = '-1'
+        if (selectedMunicipality && selectedMunicipality.name !== 'Todos'){
+             codMunicipality = selectedMunicipality.id
+        }   
         data = await fetchMunicipalityData_Sb(
           selectedDepartment.id,
-          selectedMunicipality.name
+          codMunicipality
         );
       }
 
@@ -103,14 +111,22 @@ export function FilterContainer({
       if (wantComparison && comparisonDepartment && comparisonMunicipality) {
         let comparisonData;
         if (APP_CONFIG.apiPython) {
+          let codMunicipality = '-1'
+          if (comparisonMunicipality && comparisonMunicipality.name !== 'Todos'){
+             codMunicipality = comparisonMunicipality.id
+          }
           comparisonData = await fetchMunicipalityData_Python(
             comparisonDepartment.id,
-            comparisonMunicipality.name
+            codMunicipality
           );
         } else {
+          let codMunicipality = '-1'
+          if (comparisonMunicipality && comparisonMunicipality.name !== 'Todos'){
+             codMunicipality = comparisonMunicipality.id
+          }          
           comparisonData = await fetchMunicipalityData_Sb(
             comparisonDepartment.id,
-            comparisonMunicipality.name
+            codMunicipality
           );
         }
 

@@ -126,6 +126,15 @@ export function MapViewer({
       
       if (feature) {
         const properties = feature.getProperties();
+        //remove 0 in let for Antioquia
+        let numericPropertie = 0;
+        if (properties && properties.idMunicipio && properties.idDepartamento){
+          numericPropertie = parseInt(properties.idMunicipio, 10); 
+          properties.idMunicipio = numericPropertie.toString();
+
+          numericPropertie = parseInt(properties.idDepartamento, 10); 
+          properties.idDepartamento = numericPropertie.toString();
+        }    
         setCurrentFeatureProperties(properties);
         let content = '<div class="p-4 max-w-sm">';
         

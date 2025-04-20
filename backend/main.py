@@ -124,7 +124,7 @@ async def get_municipalities_by_department(department_id: str):
         )
 
 @app.get("/municipality-data/{department_id}")
-async def get_municipality_data(department_id: str, municipality_name: str | None = None):
+async def get_municipality_data(department_id: str, municipality_id: str | None = None):
     try:
         session = SessionLocal()
 
@@ -137,9 +137,9 @@ async def get_municipality_data(department_id: str, municipality_name: str | Non
         
         params = {"department_id": department_id}
         
-        if municipality_name and municipality_name != "Todos":
-            territorial_query += " AND mpio_cnmbr = :municipality_name"
-            params["municipality_name"] = municipality_name
+        if municipality_id and municipality_id != "-1":
+            territorial_query += " AND mpio_cdpmp = :municipality_id"
+            params["municipality_id"] = municipality_id
 
         territorial_query += " ORDER BY mpio_cnmbr"
         
