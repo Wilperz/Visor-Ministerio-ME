@@ -145,7 +145,7 @@ export async function fetchInitialMunicipios() {
       const { data, error } = await supabase
         .from('div_territorial_municipios')
         .select('geom, mpio_cdpmp, mpio_cnmbr, dpto_ccdgo, dpto_cnmbr')
-        .limit(500);
+        .limit(1300);
 
       if (error) {
         throw error;

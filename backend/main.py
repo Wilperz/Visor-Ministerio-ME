@@ -49,8 +49,7 @@ async def get_initial_municipios():
         # Query to get one municipality with its geometry
         query = text("""
             SELECT id, ST_AsGeoJSON(geom) as geom, mpio_cdpmp, mpio_cnmbr, dpto_ccdgo,     dpto_cnmbr
-            FROM div_territorial_municipios
-            LIMIT 1
+            FROM div_territorial_municipios            
         """)
         
         result = session.execute(query)
