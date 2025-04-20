@@ -66,7 +66,7 @@ export function MapViewer({
       source: vectorSource,
       style: (feature) => {
         const properties = feature.getProperties();
-        console.log("**Properties poligon:", properties);
+        //console.log("**Properties poligon:", properties);
         
         // Create the polygon style
         const polygonStyle = new Style({

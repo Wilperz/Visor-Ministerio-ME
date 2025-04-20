@@ -142,16 +142,38 @@ export async function fetchInitialMunicipios() {
       }
       return await response.json();
     } else {
-      const { data, error } = await supabase
-        .from('div_territorial_municipios')
-        .select('geom, mpio_cdpmp, mpio_cnmbr, dpto_ccdgo, dpto_cnmbr')
-        .limit(1300);
+      // Initialize arrays to store all data
+      let allMunicipios: any[] = [];
+      let hasMore = true;
+      let page = 0;
+      const pageSize = 600;
 
-      if (error) {
-        throw error;
+      // Fetch all pages
+      while (hasMore) {
+        const { data, error } = await supabase
+          .from('div_territorial_municipios')
+          .select('geom, mpio_cdpmp, mpio_cnmbr, dpto_ccdgo, dpto_cnmbr')
+          .range(page * pageSize, (page + 1) * pageSize - 1);
+
+        if (error) {
+          throw error;
+        }
+
+        if (data && data.length > 0) {
+          allMunicipios = [...allMunicipios, ...data];
+          if (data.length < pageSize) {
+            hasMore = false;
+          }
+        } else {
+          hasMore = false;
+        }
+
+        page++;
       }
-      console.log("data municipio", data);
-      return data.map(muni => ({        
+
+      console.log("Total municipalities fetched:", allMunicipios.length);
+
+      return allMunicipios.map(muni => ({        
         type: 'Feature',
         geometry: muni.geom,
         properties: {          
